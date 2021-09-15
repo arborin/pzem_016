@@ -4,6 +4,23 @@ import binascii
 import re
 import requests
 import json
+import logging
+
+logger = logging.getLogger(__name__)  
+
+logger.setLevel(logging.INFO)
+
+# define file handler and set formatter
+file_handler = logging.FileHandler('device.log')
+formatter    = logging.Formatter('%(asctime)s : %(levelname)s : %(message)s')
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
+
+logger.info('Device monitoring run')
+
+
+
 
 
 class Pzem:
@@ -28,8 +45,11 @@ class Pzem:
 
         try:
             self.ser = serial.Serial(comport, 9600, timeout=0.5)
+            logger.info("Connected to PZEM-016")
         except Exception as e:
-            print("Serial communication error: {}".format(str(e)))
+            msg = "Serial communication error: {}\n".format(str(e))
+            print(msg)
+            logger.warning(msg)
 
     
     def print_vals(self):
@@ -92,14 +112,19 @@ class Pzem:
 
 
     def send_data(self):
-        
-        self.web_response = requests.get(self.url, json=self.device_vals)
-        print("\nWeb Request details:")
-        print("-------------------------")
-        print("Status code: ", self.web_response.status_code)
-        print(self.web_response.json())
-        print("-------------------------")
+        logger.info("Request sent: {}".format(self.device_vals))
 
+        try:
+            self.web_response = requests.get(self.url, json=self.device_vals)
+            print("\nWeb Request details:")
+            print("-------------------------")
+            print("Status code: ", self.web_response.status_code)
+            print(self.web_response.json())
+            print("-------------------------")
+            logger.info("Response get: {}".format(self.web_response.json()))
+
+        except Exception as e:
+            logger.warning("Request code:{}, Message: {}".format(self.web_response.status_code, e))
 
 
 
