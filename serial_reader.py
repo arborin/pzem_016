@@ -93,18 +93,19 @@ class Pzem:
 
     def send_data(self):
         
-        self.web_response = requests.post(self.url, json=self.device_vals)
+        self.web_response = requests.get(self.url, json=self.device_vals)
         print("\nWeb Request details:")
         print("-------------------------")
         print("Status code: ", self.web_response.status_code)
         print(self.web_response.json())
+        print("-------------------------")
 
 
 
 
 
 port = 'COM5'
-url = 'example_url.com'
+url = 'https://httpbin.org/ip'
 
 dev = Pzem(port, url)
 dev.read_vals()
